@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class AddUserInfoFilter implements GlobalFilter, Ordered {
@@ -45,7 +46,7 @@ public class AddUserInfoFilter implements GlobalFilter, Ordered {
                     ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                             .header(HEADER_USER_ID, jwt.getSubject() != null ? jwt.getSubject() : "")
                             .header(HEADER_USER_NAME, jwt.getClaimAsString("preferred_username") != null ? jwt.getClaimAsString("preferred_username") : "")
-                            .header(HEADER_ROLES, String.join(",", roles))
+                            .header(HEADER_ROLES, roles.stream().filter(s -> s.startsWith("ROLE")).collect(Collectors.joining(",")))
                             .build();
 
                     ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
